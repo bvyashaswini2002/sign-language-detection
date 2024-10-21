@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Interpreter</title>
+    <style>
+        body {
+            text-align: center; /* Centers all text in the body */
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .title {
+            background-color: #0000ff; /* Change this color as needed */
+            padding: 10px;
+            display: inline-block;
+            border-radius: 5px; /* Optional: adds rounded corners */
+            color: white; /* Optional: changes text color for better visibility */
+        }
+        .logo {
+            max-width: 200px; /* Set a maximum width for the logo */
+            height: auto; /* Maintain aspect ratio */
+            margin-top: 20px; /* Add some space above the logo */
+        }
+    </style>
+</head>
+<body>
+
+    
+    <h1 class="title">Text Interpreter</h1>
+    <h1>About Us</h1>
+    <img src="logo.png" class="logo"> <!-- Add your logo here -->
+    <p>Our sign-to-text converter aims to facilitate communication between deaf or hard-of-hearing individuals and those who do not understand sign language. By converting signs into text, they help bridge the communication gap.</p>
+
+    <p>Applications:<br>
+        <br>
+        Real-Time Communication: Used in conversations, lectures, and events to provide instant translation of sign language.<br>
+        Accessibility: Enhances accessibility in public places, workplaces, and educational institutions.<br>
+        Educational Tools: Aids in teaching sign language to non-signers, allowing for better learning experiences.
+    </p>
+    <p id="output"></p> <!-- Placeholder for output -->
+    <style>
+        
+        .button {
+            background-color: #4CAF50; /* Green background */
+            color: white; /* White text */
+            padding: 30px 60px; /* Some padding */
+            text-align: center; /* Center the text */
+            text-decoration: none; /* No underline */
+            display: inline-block; /* Inline block */
+            font-size: 16px; /* Font size */
+            margin: 4px 2px; /* Margins */
+            cursor: pointer; /* Pointer cursor on hover */
+            border: none; /* No border */
+            border-radius: 5px; /* Rounded corners */
+        }
+    
+        
+    </style>
+    <a href="index8.html">
+        <button class="button">Go to Text Interpreter</button>
+    </a>
+    
+
+</body>
+</html>
