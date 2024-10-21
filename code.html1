@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Language Interpretation</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/handpose"></script>
+    <style>
+        body {
+            background-color: #ffffff;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        video {
+            width: 100%;
+            max-width: 600px;
+            border: 2px solid #ccc;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            margin-top: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            transition: background-color 0.3s;
+        }
+        #start-button {
+            background-color: #4CAF50; /* Green */
+        }
+        #start-button:hover {
+            background-color: #45a049; /* Darker green on hover */
+        }
+        #stop-button {
+            background-color: #f44336; /* Red */
+        }
+        #stop-button:hover {
+            background-color: #e53935; /* Darker red on hover */
+        }
+        #feedback {
+            margin-top: 15px;
+            font-size: 18px;
+            color: #333;
+        }
+        #interpretation-result {
+            margin-top: 20px;
+            font-size: 20px;
+            color: #007BFF; /* Blue for results */
+            background-color: #f0f8ff; /* Light background color for result area */
+            padding: 10px;
+            border-radius: 5px;
+            display: inline-block; /* Ensure it wraps around content */
+        }
+    </style>
+</head>
+<body>
+    <h1>Sign Language Interpretation</h1>
+    <p>Activate the video feed for sign language interpretation.</p>
+
+    <video id="video" autoplay playsinline></video>
+    <br>
+    <button id="start-button">Start Video Feed</button>
+    <button id="stop-button" disabled>Stop Video Feed</button>
+
+    <div id="feedback"></div>
+    <div id="interpretation-result"></div>
+
+    <script>
+        const video = document.getElementById('video');
+        const startButton = document.getElementById('start-button');
+        const stopButton = document.getElementById('stop-button');
+        const feedback = document.getElementById('feedback');
+        const interpretationResult = document.getElementById('interpretation-result');
+
+        let mediaStream = null;
+        let model;
+
+        startButton.addEventListener('click', async () => {
+            try {
+                mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = mediaStream;
+                startButton.disabled = true;
+                stopButton.disabled = false;
+                feedback.textContent = 'Webcam is active.';
+                feedback.style.color = 'green';
+                await loadModel();
+                startRecognition();
+            } catch (error) {
+                console.error('Error accessing webcam:', error);
+                alert('Could not access webcam. Please check your permissions.');
+                feedback.textContent = 'Failed to access webcam.';
+                feedback.style.color = 'red';
+            }
+        });
+
+        stopButton.addEventListener('click', () => {
+            if (mediaStream) {
+                mediaStream.getTracks().forEach(track => track.stop());
+                video.srcObject = null;
+                startButton.disabled = false;
+                stopButton.disabled = true;
+                feedback.textContent = 'Webcam is off.';
+                feedback.style.color = 'red';
+                interpretationResult.textContent = ''; // Clear the result
+            }
+        });
+
+        async function loadModel() {
+            model = await handpose.load();
+            console.log("Handpose model loaded.");
+        }
+
+        async function recognizeGesture() {
+            const predictions = await model.estimateHands(video);
+            if (predictions.length > 0) {
+                const landmarks = predictions[0].landmarks;
+
+                const thumbTipY = landmarks[4][1];
+                const indexTipY = landmarks[8][1];
+                const middleTipY = landmarks[12][1];
+                const ringTipY = landmarks[16][1];
+                const pinkyTipY = landmarks[20][1];
+
+                // Gesture detection logic
+                if (thumbTipY < indexTipY && indexTipY < middleTipY) {
+                    return "Thumbs Up"; // Thumbs up gesture
+                }
+                if (indexTipY < thumbTipY && middleTipY < thumbTipY) {
+                    return "Pointing"; // Pointing gesture
+                }
+                if (thumbTipY < indexTipY && middleTipY > indexTipY && ringTipY > indexTipY) {
+                    return "Stop"; // Palm facing camera
+                }
+                if (indexTipY < middleTipY && middleTipY < ringTipY && ringTipY < pinkyTipY) {
+                    return "Peace"; // Peace sign
+                }
+                if (indexTipY < middleTipY && middleTipY < ringTipY) {
+                    return "Clap"; // Clapping gesture
+                }
+                if (thumbTipY < indexTipY && thumbTipY < middleTipY) {
+                    return "Hang Loose"; // Hang loose
+                }
+                if (thumbTipY < indexTipY && indexTipY < middleTipY && middleTipY < ringTipY) {
+                    return "Thank You"; // Thank you sign
+                }
+                if (indexTipY < middleTipY && middleTipY < ringTipY && ringTipY < thumbTipY) {
+                    return "I Love You"; // I Love You sign
+                }
+                if (indexTipY < thumbTipY && middleTipY < ringTipY) {
+                    return "Call Me"; // Call Me gesture
+                }
+                if (indexTipY > thumbTipY && middleTipY > thumbTipY) {
+                    return "Waving"; // Waving
+                }
+                return "Hand Detected"; // Hand detected but not a specific gesture
+            }
+            return "No Gesture Detected";
+        }
+
+        async function startRecognition() {
+            setInterval(async () => {
+                const result = await recognizeGesture();
+                interpretationResult.textContent = Gesture Result: ${result};
+            }, 2000); // Check every 2 seconds
+        }
+    </script>
+    
+</body>
+</html>
